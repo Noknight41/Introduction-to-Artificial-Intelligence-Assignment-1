@@ -16,11 +16,21 @@ class Tents:
         return file[:self.n], rowConstraint, columnConstraint
 
     def treeHasTent(self, mapTents, i, j):
-        pass
-
+        neighbors = [[i, j+1],[i,j-1],[i+1,j],[i-1,j]]
+        for neighbor in neighbors:
+            if neighbor[0] < 0 or neighbor[0] > self.n - 1 or neighbor[1] < 0 or neighbor[1] > self.n - 1:
+                continue
+            if mapTents[neighbor[0]][neighbor[1]] == -1:
+                return True
+        return False
+            
     def allTreeHasTent(self, mapTents):
+        for i in range(0, self.n):
+            for j in range(0, self.n):
+                if mapTents[i][j] == 1 and (not self.treeHasTent(mapTents, i, j)):
+                    return False
         return True
-    
+                    
     def legalPlace(self, mapTents, i, j):
         surround = [[i, j+1],[i,j-1],[i+1,j+1],[i-1,j-1],
                     [i+1,j],[i-1,j],[i+1,j-1],[i-1,j+1]]
@@ -60,7 +70,6 @@ class Tents:
         else:
             return # Have found solution, other branches stop searching
             
-
     def solve(self, path):
         mapTents, rowConstraint, columnConstraint = self.load(path)
         self.checkAndPlace(mapTents, rowConstraint, columnConstraint, 0, 0)
@@ -69,4 +78,4 @@ class Tents:
         
 
 tents = Tents()
-tents.solve("test_1.txt")
+tents.solve("test_2.txt")
