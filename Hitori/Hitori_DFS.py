@@ -28,6 +28,7 @@ def isInValidPointDark(array, i,j):
     if(top < 0 or bot < 0 or left < 0 or right < 0):
         return True
     else: return False
+    
 def isInValidPointWhite(array, i,j):
     top = array[i-1][j] if i > 0 else -1
     bot = array[i+1][j] if i < len(array) - 1 else -1
@@ -37,12 +38,11 @@ def isInValidPointWhite(array, i,j):
         return True
     else: return False
 
-
 def checkSolution(array):
     global a
     a += 1
     # print(array)
-    print('Loading ', a)
+    # print('Loading ', a)
     # if(a == 20): return True
     for i in array:
         result = list(filter(lambda x: x >0, i))
@@ -76,6 +76,6 @@ def printArray(array):
             else: temp +=  ' ' + str(array[i][j]) 
         print(temp)
 
-array = load("test5.txt")
+array = load("test_2.txt")
 solve(array)
 print("--- %s seconds ---" % (time.time() - start_time))
