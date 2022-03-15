@@ -1,4 +1,5 @@
 from turtle import right
+from matplotlib.pyplot import flag
 import numpy as np
 from collections import Counter
 import time
@@ -6,6 +7,26 @@ start_time = time.time()
 
 a = 0 
 
+from collections import defaultdict
+class Graph:
+    def __init__(self):
+        self.graph = defaultdict(list)
+    def addEdge(self,u,v):
+        self.graph[u].append(v)
+    def connected(self, s, num):
+        visited = [False] * (max(self.graph) + 1)
+        queue = []
+        queue.append(s)
+        visited[s] = True
+        while queue:
+            s = queue.pop(0)
+            for i in self.graph[s]:
+                if visited[i] == False:
+                    queue.append(i)
+                    visited[i] = True
+        if(visited.count(True) != num): return True
+        else: return False
+            
 def solve(array):
     solveSub(array, 0)
 
@@ -13,12 +34,24 @@ def solveSub(array, index):
     length = len(array)
     if(index == length * length):
         return checkSolution(array)
-    if(solveSub(array, index+1)):
-        return True
+    flag1 = False
+    flag2 = False
+    temp = []
+    if(list(array[int(index/length)]).count(array[int(index / length)][index % length]) == 1):
+        flag1 = True
+    for i in range(len(array)):
+        temp.append(array[i][index % length])
+    if(temp.count(array[int(index / length)][index % length]) == 1):
+        flag2 = True
+    if(flag1 and flag2):
+        return solveSub(array, index+1)
     else:
-        array_temp = array.copy()
-        array_temp[int(index / length)][index % length] =  - array_temp[int(index / length)][index % length]
-        return solveSub(array_temp, index+1)
+        if(solveSub(array, index+1)):
+            return True
+        else:
+            array_temp = array.copy()
+            array_temp[int(index / length)][index % length] =  - array_temp[int(index / length)][index % length]
+            return solveSub(array_temp, index+1)
 
 def isInValidPointDark(array, i,j):
     top = array[i-1][j] if i > 0 else 1
@@ -41,9 +74,7 @@ def isInValidPointWhite(array, i,j):
 def checkSolution(array):
     global a
     a += 1
-    # print(array)
-    # print('Loading ', a)
-    # if(a == 20): return True
+    print('Loading ', a)
     for i in array:
         result = list(filter(lambda x: x >0, i))
         if(len(list(Counter(result))) != len(result)): return False
@@ -53,29 +84,56 @@ def checkSolution(array):
             temp.append(array[i][j])
         result = list(filter(lambda x: x >0, temp))
         if(len(list(Counter(result))) != len(result)): return False
-
+    g =  Graph()
+    start = 0
+    num = 0
     for i in range(len(array)):
         for j in range(len(array)):
             if(array[i][j] < 0):
                 if(isInValidPointDark(array,i,j)): return False
             else:
                 if(isInValidPointWhite(array,i,j)): return False
+                num += 1
+                if(start == 0): start = i*len(array)+j
+                top = (i-1)*len(array)+j if i > 0 and array[i-1][j] > 0 else -1
+                bot = (i+1)*len(array)+j   if i < len(array) - 1 and array[i+1][j] > 0 else -1
+                left = i*len(array)+j-1   if j > 0 and array[i][j-1] > 0 else -1
+                right = i*len(array)+j+1   if j < len(array) - 1 and array[i][j+1] > 0 else -1
+                
+                if(top != -1):
+                    g.addEdge(i*len(array)+j,top)
+                if(bot  != -1):
+                    g.addEdge(i*len(array)+j,bot)
+                if(left  != -1):
+                    g.addEdge(i*len(array)+j,left)
+                if(right  != -1):
+                    g.addEdge(i*len(array)+j,right)
+ 
+    if(g.connected(start,num)): 
+        return False
+    # else:
+        
+    #     return False
     printArray(array)
     return True
-
 
 def load(path):
     array = np.loadtxt(path, dtype=int)
     return array
 
 def printArray(array):
+    a = -1
     for i in range(len(array)):
         temp = ''
+        temp1 = ''
         for j in range(len(array)):
             if(array[i][j] > 0 ): temp += '  ' + str(array[i][j]) 
             else: temp +=  ' ' + str(array[i][j]) 
-        print(temp)
+            if(array[i][j] > 0 ): temp1 += ' ' + 'o' 
+            else: temp1 +=  ' ' + 'x'
+        print(temp + '   ' + temp1)
 
 array = load("test_2.txt")
 solve(array)
+if(a != -1): print("No solution")
 print("--- %s seconds ---" % (time.time() - start_time))
