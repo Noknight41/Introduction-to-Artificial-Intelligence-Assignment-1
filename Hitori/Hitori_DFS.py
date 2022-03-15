@@ -122,7 +122,6 @@ def load(path):
     return array
 
 def printArray(array):
-    a = -1
     for i in range(len(array)):
         temp = ''
         temp1 = ''
@@ -135,5 +134,4 @@ def printArray(array):
 
 array = load("test_2.txt")
 solve(array)
-if(a != -1): print("No solution")
 print("--- %s seconds ---" % (time.time() - start_time))
