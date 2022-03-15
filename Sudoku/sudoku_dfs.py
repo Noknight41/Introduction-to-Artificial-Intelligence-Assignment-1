@@ -26,16 +26,14 @@ class Node:
     
     def legalValue(self, value, i, j):
         return value in self.row[i] and value in self.column[j] and value in self.block[(i // self.m) * self.m + j // self.m]
-        
-    def printNode(self):
-        print(self.data)
+
 
 class Sudoku:
     def __init__(self):
         pass
     
+    # Load Sudoku from txt file 
     def load(self, path):
-        # Load a configuration to solve.
         with open(path, "r") as f:
             val = np.loadtxt(f).astype(int)
             self.n = int(math.sqrt(len(val)))

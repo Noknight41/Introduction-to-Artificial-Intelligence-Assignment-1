@@ -103,7 +103,7 @@ class Sudoku:
         return([proposedSudoku, boxesToFlip])
 
 
-    def ChooseNewState (self, currentSudoku, fixedSudoku, listOfBlocks, sigma):
+    def ChooseNewState (self, currentSudoku, fixedSudoku, listOfBlocks, temperature):
         proposal = self.ProposedState(currentSudoku, fixedSudoku, listOfBlocks)
         newSudoku = proposal[0]
         boxesToCheck = proposal[1]
@@ -113,7 +113,7 @@ class Sudoku:
         newVal = self.CalculateNumberOfErrorsRowColumn(boxesToCheck[0][0], boxesToCheck[0][1], newSudoku) + self.CalculateNumberOfErrorsRowColumn(boxesToCheck[1][0], boxesToCheck[1][1], newSudoku)
         
         costDifference = newVal - curVal
-        rho = math.exp( -costDifference / sigma)
+        rho = math.exp( -costDifference / temperature)
         if(np.random.uniform(1, 0, 1) < rho):
             return([newSudoku, costDifference])
         return([currentSudoku, 0])
@@ -123,12 +123,12 @@ class Sudoku:
         numberOfIterations = 0
         for i in range (0, self.m ** 2):
             for j in range (0, self.m ** 2):
-                if fixed_sudoku[i,j] != 0:
+                if fixed_sudoku[i,j] == 0:
                     numberOfIterations += 1
         return numberOfIterations
 
-    # Calculate Initial Sigma
-    def CalculateInitialSigma(self, sudoku, fixedSudoku, listOfBlocks):
+    # Calculate Initial temperature
+    def CalculateInitialTemperature(self, sudoku, fixedSudoku, listOfBlocks):
         listOfDifferences = []
         tmpSudoku = sudoku
         for i in range(1, self.m ** 2 + 1):
@@ -151,15 +151,16 @@ class Sudoku:
         listOfBlocks = self.CreateListofBlocks()
         tmpSudoku = self.RandomlyFillBlocks(self.data, listOfBlocks)
         
-        # Sigma + Score + Iterations
-        sigma = self.CalculateInitialSigma(self.data, fixedSudoku, listOfBlocks)
+        # temperature + Score + Iterations
+        temperature = self.CalculateInitialTemperature(self.data, fixedSudoku, listOfBlocks)
         score = self.CalculateNumberOfErrors(tmpSudoku)
         iterations = self.ChooseNumberOfIterations(fixedSudoku)
-
+        print(iterations)
+        
         while solutionFound == 0:
             previousScore = score
             for i in range (0, iterations):
-                newState = self.ChooseNewState(tmpSudoku, fixedSudoku, listOfBlocks, sigma)
+                newState = self.ChooseNewState(tmpSudoku, fixedSudoku, listOfBlocks, temperature)
                 tmpSudoku = newState[0]
                 scoreDiff = newState[1]
                 score += scoreDiff
@@ -169,7 +170,7 @@ class Sudoku:
                     solutionFound = 1
                     break
 
-            sigma *= decreaseFactor
+            temperature *= decreaseFactor
             if score == 0:
                 solutionFound = 1
                 break
@@ -177,8 +178,8 @@ class Sudoku:
                 stuckCount += 1
             else:
                 stuckCount = 0
-            if (stuckCount > 80):
-                sigma += 2
+            if stuckCount > 80:
+                temperature += 2
         f.close()
         self.solution = tmpSudoku
         self.printSudoku(tmpSudoku)
@@ -187,8 +188,6 @@ class Sudoku:
         plt.xlabel("Number of Tries")
         plt.show()
         
-
-
 sudoku = Sudoku()
-sudoku.load("test_3.txt")
+sudoku.load("test_2.txt")
 sudoku.solve()
