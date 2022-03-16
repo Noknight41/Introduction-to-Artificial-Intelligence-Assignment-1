@@ -35,11 +35,10 @@ class Sudoku:
     # Load Sudoku from txt file 
     def load(self, path):
         with open(path, "r") as f:
-            val = np.loadtxt(f).astype(int)
-            self.n = int(math.sqrt(len(val)))
+            file = np.loadtxt(f).astype(int)
+            self.n = len(file[0])
             self.m = int(math.sqrt(self.n))
-            values = val.reshape((self.m * self.m, self.m * self.m))
-            self.printPuzzle(values)
+            self.printPuzzle(file)
             r = []
             c = []
             b = []
@@ -47,7 +46,7 @@ class Sudoku:
                 r.append(list(range(1, self.n + 1)))
                 c.append(list(range(1, self.n + 1)))
                 b.append(list(range(1, self.n + 1)))
-            self.start = Node(self.m , values, r, c, b)
+            self.start = Node(self.m , file, r, c, b)
         return
 
     def process(self):

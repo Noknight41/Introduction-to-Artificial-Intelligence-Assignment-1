@@ -12,10 +12,10 @@ class Sudoku:
     # Load Sudoku from txt file 
     def load(self, path):
         with open(path, "r") as f:
-            val = np.loadtxt(f).astype(int)
-            self.n = int(math.sqrt(len(val)))
+            file = np.loadtxt(f).astype(int)
+            self.n = len(file[0])
             self.m = int(math.sqrt(self.n))
-            self.data = val.reshape((self.m * self.m, self.m * self.m))
+            self.data = file.reshape((self.m * self.m, self.m * self.m))
         
     # Print the Sudoku
     def printSudoku(self, data):
