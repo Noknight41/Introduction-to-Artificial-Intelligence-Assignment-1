@@ -4,6 +4,8 @@ import math
 from random import choice
 import statistics 
 import matplotlib.pyplot as plt
+import time
+
 
 class Sudoku:    
     def __init__(self):
@@ -118,7 +120,6 @@ class Sudoku:
             return([newSudoku, costDifference])
         return([currentSudoku, 0])
 
-
     def ChooseNumberOfIterations(self, fixed_sudoku):
         numberOfIterations = 0
         for i in range (0, self.m ** 2):
@@ -127,18 +128,8 @@ class Sudoku:
                     numberOfIterations += 1
         return numberOfIterations
 
-    # Calculate Initial temperature
-    def CalculateInitialTemperature(self, sudoku, fixedSudoku, listOfBlocks):
-        listOfDifferences = []
-        tmpSudoku = sudoku
-        for i in range(1, self.m ** 2 + 1):
-            tmpSudoku = self.ProposedState(tmpSudoku, fixedSudoku, listOfBlocks)[0]
-            listOfDifferences.append(self.CalculateNumberOfErrors(tmpSudoku))
-        return statistics.pstdev(listOfDifferences)
-
     # Solve the sudoku
     def solve(self):
-        f = open("result.txt", "a")
         result = []
         solutionFound = 0
         decreaseFactor = 0.99
@@ -152,10 +143,10 @@ class Sudoku:
         tmpSudoku = self.RandomlyFillBlocks(self.data, listOfBlocks)
         
         # temperature + Score + Iterations
-        temperature = self.CalculateInitialTemperature(self.data, fixedSudoku, listOfBlocks)
+        temperature = 1
         score = self.CalculateNumberOfErrors(tmpSudoku)
         iterations = self.ChooseNumberOfIterations(fixedSudoku)
-        print(iterations)
+        
         
         while solutionFound == 0:
             previousScore = score
@@ -165,7 +156,6 @@ class Sudoku:
                 scoreDiff = newState[1]
                 score += scoreDiff
                 result += [score]
-                f.write(str(score) + '\n')
                 if score == 0:
                     solutionFound = 1
                     break
@@ -183,11 +173,18 @@ class Sudoku:
         f.close()
         self.solution = tmpSudoku
         self.printSudoku(tmpSudoku)
+        print("--- %s seconds ---" % (time.time() - start_time))
         plt.plot(result)
         plt.ylabel("Number of Error(s)")
         plt.xlabel("Number of Tries")
         plt.show()
         
 sudoku = Sudoku()
-sudoku.load("test_2.txt")
+sudoku.load("test_20.txt")
+start_time = time.time()
 sudoku.solve()
+
+# 11: 25,061,118
+# 16: 37,251,751
+# 18: 13,336,158
+# 19: 8,449,051
