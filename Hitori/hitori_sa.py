@@ -251,7 +251,8 @@ class Hitori:
 
         return tempHitori
 
-    def madeNewChange(self, old_score, pos, temperature):
+    def madeNewChange(self, old_score, temperature, keys):
+        pos = keys[self.rng.integers(0, len(keys))]
         old_value = self.temp_arr[pos], self.dup_lists[pos]
         result = 0
         if self.rng.uniform(0, 1, None) < 0.5:
@@ -291,6 +292,7 @@ class Hitori:
                     self.dup_lists[i] = 'w'
 
     def solve(self):
+        start_time = time.time()
         stuckCount = 0
         
         decrease_factor = .99
@@ -320,12 +322,14 @@ class Hitori:
         
         result = []
         counting = 0
+        iterations_max = len(self.dup_lists)
+        keys = [*self.dup_lists]
         while not is_solve:
             previous_score = score
-            for i in self.dup_lists:
+            for i in range(iterations_max):
                 counting += 1
-                score += self.madeNewChange(score, i, temperature)
-                result += [score]
+                score += self.madeNewChange(score, temperature, keys)
+                result.append(score)
                 if 0 == score:
                     if self.checkResult():
                         is_solve = True
@@ -337,15 +341,13 @@ class Hitori:
                     is_solve = True
             elif score >= previous_score:
                 stuckCount += 1
-                if stuckCount > 20:
+                if stuckCount > 10:
                     temperature += 10
-                    self.temp_arr = np.copy(hold_arr)
-                    self.dup_lists = tmp[0]
-                    score = old_score
+                    
             else:
                 stuckCount = 0
             self.current_black = []
-        
+        print("--- %s seconds ---" % (time.time() - start_time))
         self.solution = np.copy(self.temp_arr)
         plt.plot(result)
         plt.ylabel("Number of Error(s)")
@@ -357,12 +359,12 @@ def main(argv):
     hitori = Hitori()
     for testCase in argv:
         hitori.load(testCase)
-        start_time = time.time()
         hitori.solve()
-        print("--- %s seconds ---" % (time.time() - start_time))
         hitori.printSolution()
 
 
 if __name__ == '__main__':
     # main(sys.argv[1:])
     main(["test1.txt"])
+
+
