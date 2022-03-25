@@ -291,6 +291,7 @@ class Hitori:
                     self.dup_lists[i] = 'w'
 
     def solve(self):
+        start_time = time.time()
         stuckCount = 0
         
         decrease_factor = .99
@@ -326,6 +327,9 @@ class Hitori:
                 counting += 1
                 score += self.madeNewChange(score, i, temperature)
                 result += [score]
+
+                print(score)
+
                 if 0 == score:
                     if self.checkResult():
                         is_solve = True
@@ -347,22 +351,33 @@ class Hitori:
             self.current_black = []
         
         self.solution = np.copy(self.temp_arr)
+        print("--- %s seconds ---" % (time.time() - start_time))
         plt.plot(result)
         plt.ylabel("Number of Error(s)")
         plt.xlabel("Number of Tries")
         plt.show()
 
 
+
 def main(argv):
     hitori = Hitori()
     for testCase in argv:
         hitori.load(testCase)
-        start_time = time.time()
+
+       
         hitori.solve()
-        print("--- %s seconds ---" % (time.time() - start_time))
+        
+
+        hitori.solve()
+
         hitori.printSolution()
 
 
 if __name__ == '__main__':
+
     # main(sys.argv[1:])
     main(["test1.txt"])
+
+    main(sys.argv[1:])
+    # main(["test1.txt"])
+
