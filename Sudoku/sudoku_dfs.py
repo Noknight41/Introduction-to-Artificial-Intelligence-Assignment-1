@@ -2,7 +2,34 @@ import numpy as np
 import math
 import copy
 import time
+import tracemalloc
+import linecache
+import os
 
+def display_top(snapshot, key_type='lineno', limit=3):
+    snapshot = snapshot.filter_traces((
+        tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
+        tracemalloc.Filter(False, "<unknown>"),
+    ))
+    top_stats = snapshot.statistics(key_type)
+
+    print("Top %s lines" % limit)
+    for index, stat in enumerate(top_stats[:limit], 1):
+        frame = stat.traceback[0]
+        # replace "/path/to/module/file.py" with "module/file.py"
+        filename = os.sep.join(frame.filename.split(os.sep)[-2:])
+        print("#%s: %s:%s: %.1f KiB"
+              % (index, filename, frame.lineno, stat.size / 1024))
+        line = linecache.getline(frame.filename, frame.lineno).strip()
+        if line:
+            print('    %s' % line)
+
+    other = top_stats[limit:]
+    if other:
+        size = sum(stat.size for stat in other)
+        print("%s other: %.1f KiB" % (len(other), size / 1024))
+    total = sum(stat.size for stat in top_stats)
+    print("Total allocated size: %.1f B" % (total))
 
 class Node:
     def __init__(self, size, data, row, column, block):
@@ -28,7 +55,6 @@ class Node:
     
     def legalValue(self, value, i, j):
         return value in self.row[i] and value in self.column[j] and value in self.block[(i // self.m) * self.m + j // self.m]
-
 
 class Sudoku:
     def __init__(self):
@@ -76,12 +102,13 @@ class Sudoku:
         return result
                 
     # Load Sudoku from txt file
-    def load(self, path):
+    def load(self, path, print = True):
         with open(path, "r") as f:
             file = np.loadtxt(f).astype(int)
             self.n = len(file[0])
             self.m = int(math.sqrt(self.n))
-            self.printPuzzle(file)
+            if print == True:
+                self.printPuzzle(file)
             r = []
             c = []
             b = []
@@ -143,16 +170,24 @@ class Sudoku:
                 line += str(data[i,j])+" "
             print(line)
             
-    def solve(self):
+    def solve(self, print = True):
         self.start.preChecking()
         self.process()
-        self.printPuzzle(self.solution.data)
-        print("--- %s seconds ---" % (time.time() - start_time))
+        if print == True:
+            self.printPuzzle(self.solution.data)
         return
 
+# Start
+tracemalloc.start()
+# start_time = time.time()
+
 puzzle = Sudoku()
-puzzle.load("test_20.txt")
-start_time = time.time()
-puzzle.solve()
+puzzle.load("test_14.txt", False)
+puzzle.solve(False)
+# print("--- %s seconds ---" % (time.time() - start_time))
+# start_time = time.time()
+snapshot = tracemalloc.take_snapshot()
+display_top(snapshot)
+
 
 

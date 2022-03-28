@@ -2,10 +2,36 @@ import random
 import numpy as np
 import math 
 from random import choice
-import statistics 
 import matplotlib.pyplot as plt
 import time
+import tracemalloc
+import linecache
+import os
 
+def display_top(snapshot, key_type='lineno', limit=3):
+    snapshot = snapshot.filter_traces((
+        tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
+        tracemalloc.Filter(False, "<unknown>"),
+    ))
+    top_stats = snapshot.statistics(key_type)
+
+    print("Top %s lines" % limit)
+    for index, stat in enumerate(top_stats[:limit], 1):
+        frame = stat.traceback[0]
+        # replace "/path/to/module/file.py" with "module/file.py"
+        filename = os.sep.join(frame.filename.split(os.sep)[-2:])
+        print("#%s: %s:%s: %.1f KiB"
+              % (index, filename, frame.lineno, stat.size / 1024))
+        line = linecache.getline(frame.filename, frame.lineno).strip()
+        if line:
+            print('    %s' % line)
+
+    other = top_stats[limit:]
+    if other:
+        size = sum(stat.size for stat in other)
+        print("%s other: %.1f KiB" % (len(other), size / 1024))
+    total = sum(stat.size for stat in top_stats)
+    print("Total allocated size: %.1f B" % (total))
 
 class Sudoku:    
     def __init__(self):
@@ -129,13 +155,14 @@ class Sudoku:
         return numberOfIterations
 
     # Solve the sudoku
-    def solve(self):
+    def solve(self, printR = True):
         result = []
         solutionFound = 0
         decreaseFactor = 0.99
         stuckCount = 0
         fixedSudoku = np.copy(self.data)
-        self.printSudoku(self.data)
+        if printR == True:
+            self.printSudoku(self.data)
         
         # Fixed Value and Assign Random Value to Sudoku
         fixedSudoku = self.FixSudokuValues(fixedSudoku)
@@ -155,7 +182,7 @@ class Sudoku:
                 tmpSudoku = newState[0]
                 scoreDiff = newState[1]
                 score += scoreDiff
-                result += [score]
+                result += [-score]
                 if score == 0:
                     solutionFound = 1
                     break
@@ -170,19 +197,29 @@ class Sudoku:
                 stuckCount = 0
             if stuckCount > 80:
                 temperature += 2
-        f.close()
         self.solution = tmpSudoku
-        self.printSudoku(tmpSudoku)
-        print("--- %s seconds ---" % (time.time() - start_time))
-        plt.plot(result)
-        plt.ylabel("Number of Error(s)")
-        plt.xlabel("Number of Tries")
-        plt.show()
+        if printR == True:
+            self.printSudoku(tmpSudoku)
+        print(len(result), sum(result) / len(result))
+        # print("--- %s seconds ---" % (time.time() - start_time))
+        # plt.plot(result)
+        # plt.ylabel("Number of Error(s)")
+        # plt.xlabel("Number of Tries")
+        # plt.show()
         
-sudoku = Sudoku()
-sudoku.load("test_20.txt")
-start_time = time.time()
-sudoku.solve()
+
+
+# start_time = time.time()
+tracemalloc.start()
+puzzle = Sudoku()
+puzzle.load("test_10.txt")
+puzzle.solve(False)
+# print("--- %s seconds ---" % (time.time() - start_time))
+# start_time = time.time()
+snapshot = tracemalloc.take_snapshot()
+display_top(snapshot)
+    
+
 
 # 11: 25,061,118
 # 16: 37,251,751
