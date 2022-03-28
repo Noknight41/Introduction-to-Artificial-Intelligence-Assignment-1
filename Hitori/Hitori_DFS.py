@@ -132,6 +132,6 @@ def printArray(array):
             else: temp1 +=  ' ' + 'x'
         print(temp + '   ' + temp1)
 
-array = load("test_2.txt")
+array = load("test_9.txt")
 solve(array)
 print("--- %s seconds ---" % (time.time() - start_time))
