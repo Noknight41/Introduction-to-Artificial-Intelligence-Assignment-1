@@ -6,6 +6,35 @@ import matplotlib.pyplot as plt
 import sys
 from collections import Counter, deque
 
+import tracemalloc
+import linecache
+import os
+
+def display_top(snapshot, key_type='lineno', limit=3):
+    snapshot = snapshot.filter_traces((
+        tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
+        tracemalloc.Filter(False, "<unknown>"),
+    ))
+    top_stats = snapshot.statistics(key_type)
+
+    print("Top %s lines" % limit)
+    for index, stat in enumerate(top_stats[:limit], 1):
+        frame = stat.traceback[0]
+        # replace "/path/to/module/file.py" with "module/file.py"
+        filename = os.sep.join(frame.filename.split(os.sep)[-2:])
+        print("#%s: %s:%s: %.1f KiB"
+              % (index, filename, frame.lineno, stat.size / 1024))
+        line = linecache.getline(frame.filename, frame.lineno).strip()
+        if line:
+            print('    %s' % line)
+
+    other = top_stats[limit:]
+    if other:
+        size = sum(stat.size for stat in other)
+        print("%s other: %.1f KiB" % (len(other), size / 1024))
+    total = sum(stat.size for stat in top_stats)
+    print("Total allocated size: %.1f B" % (total))
+
 
 class Hitori:
     def __init__(self, path=None):
@@ -106,7 +135,8 @@ class Hitori:
         element = 0
         probe = [0, 0, 0, 0]
         wait_list = deque()
-        for i in range(len(self.temp_arr)):
+        lenght = len(self.temp_arr)
+        for i in range(lenght):
             if 0 != self.temp_arr[i]:
                 whiteCell.append(i)
                 if not flag:
@@ -117,12 +147,16 @@ class Hitori:
                         if element not in visited:
                             visited.append(element)
                             probe[0] = element - 1
+                            if int(probe[0]/self.dimension) != int(element/self.dimension):
+                                probe[0] = element
                             probe[1] = element + 1
+                            if int(probe[1]/self.dimension) != int(element/self.dimension):
+                                probe[1] = element
                             probe[2] = element - self.dimension
                             probe[3] = element + self.dimension
                             for ii in probe:
-                                if ii >= 0 and ii < len(self.array_grid):
-                                    if self.temp_arr[ii] != 0:
+                                if ii >= 0 and ii < lenght:
+                                    if 0 != self.temp_arr[ii]:
                                         wait_list.append(ii)
 
         return len(visited) != len(whiteCell)
@@ -130,7 +164,8 @@ class Hitori:
     def __checkNoContinueBlack(self):
         lenght = len(self.array_grid)
         bound_check = lambda x: x >= 0 and x < lenght
-        check_element = lambda x : [x + 1, x - 1, x + self.dimension, x - self.dimension]
+        row_check = lambda x, base : [x] if int(x/self.dimension) == int(base/self.dimension) else []
+        check_element = lambda x : row_check(x + 1, x) + row_check(x - 1, x) + [ x + self.dimension, x - self.dimension]
         crit = lambda x : bound_check(x) and 0 == self.temp_arr[x]
         for i in self.old_dub_lists.keys():
             if 0 == self.temp_arr[i]:
@@ -237,8 +272,9 @@ class Hitori:
         self.dup_lists = tmp[0]
         temperature = len(self.dup_lists) * 100
         
-        hold_arr = np.copy(self.array_grid)
-        self.temp_arr = self.__initSolver(hold_arr)
+        #self.temp_arr = np.copy(self.array_grid)
+        #hold_arr = np.copy(self.array_grid)
+        self.temp_arr = self.__initSolver(np.copy(self.array_grid))
         
         self.old_dub_lists = self.dup_lists
         
@@ -247,9 +283,8 @@ class Hitori:
         self.dup_pairs = tmp[1]
         self.dup_lists = tmp[0]
         
-        old_score = score = self.__scoreCalc()
-        
-        previous_score = 0
+        previous_score = score = self.__scoreCalc()
+
         is_solve = (not score) and self.__checkResult()
         
         result = []
@@ -275,10 +310,14 @@ class Hitori:
                 stuckCount += 1
                 if stuckCount > 10:
                     temperature += 10
+                    
             else:
                 stuckCount = 0
-        print("--- %s seconds ---" % (time.time() - start_time))
+        
         self.solution = np.copy(self.temp_arr)
+        print(len(result))
+        print((time.time() - start_time))
+        print("--- %s seconds ---" % (time.time() - start_time))
         plt.plot(result)
         plt.ylabel("Number of Error(s)")
         plt.xlabel("Number of Tries")
@@ -288,13 +327,15 @@ class Hitori:
 def main(argv):
     hitori = Hitori()
     for testCase in argv:
+        #tracemalloc.start()
         hitori.load(testCase)
         hitori.solve()
         hitori.printSolution()
-        print()
+        #snapshot = tracemalloc.take_snapshot()
+        #display_top(snapshot) 
+        #print('\n')
 
 if __name__ == '__main__':
-    # main(sys.argv[1:])
-    main(["test_1.txt"])
+    main(sys.argv[1:])
 
 
