@@ -17,7 +17,7 @@ def display_top(snapshot, key_type='lineno', limit=3):
         tracemalloc.Filter(False, "<unknown>"),
     ))
     top_stats = snapshot.statistics(key_type)
-    
+
     print("Top %s lines" % limit)
     for index, stat in enumerate(top_stats[:limit], 1):
         frame = stat.traceback[0]
@@ -36,6 +36,7 @@ def display_top(snapshot, key_type='lineno', limit=3):
     total = sum(stat.size for stat in top_stats)
     print("Total allocated size: %.1f B" % total)
     print(total)
+
 
 class Hitori:
     def __init__(self, path=None):
@@ -56,7 +57,7 @@ class Hitori:
         length = len(self.array_grid)
         self.dimension = int(math.sqrt(length))
         if length != self.dimension * self.dimension:
-            raise {}
+            raise RuntimeError("Incorrect dimension!")
 
     def __printGrid(self, grid):
         i = 0
@@ -165,8 +166,8 @@ class Hitori:
         return len(visited) != len(white_cell)
 
     def __checkNoContinueBlack(self):
-        lenght = len(self.array_grid)
-        bound_check = lambda x: 0 <= x < lenght
+        length = len(self.array_grid)
+        bound_check = lambda x: 0 <= x < length
         row_check = lambda x, base: [x] if int(x / self.dimension) == int(base / self.dimension) else []
         check_element = lambda x: row_check(x + 1, x) + row_check(x - 1, x) + [x + self.dimension, x - self.dimension]
         crit = lambda x: bound_check(x) and 0 == self.temp_arr[x]
@@ -234,8 +235,8 @@ class Hitori:
         pos = keys[self.rng.integers(0, len(keys))]
         old_value = self.temp_arr[pos], self.dup_lists[pos]
         result = 0
-        #if self.rng.uniform(0, 1, None) < 0.5:
-        if 'b' == self.dup_lists[pos] or 'u' == self.dup_lists[pos]:
+        # if self.rng.uniform(0, 1, None) < 0.5:
+        if 'b' == self.dup_lists[pos]:
             self.dup_lists[pos] = 'w'
             self.temp_arr[pos] = self.array_grid[pos]
         else:
@@ -244,8 +245,9 @@ class Hitori:
 
         new_score = self.__scoreCalc()
         score_delta = new_score - old_score
+
         pr = math.exp((- score_delta / temperature))
-        if self.rng.uniform(0, 1, None) < pr:
+        if score_delta < 0 or self.rng.uniform(0, 1, None) < pr:
             result = score_delta
         else:
             self.temp_arr[pos] = old_value[0]
@@ -322,9 +324,9 @@ class Hitori:
                 stuck_count = 0
 
         self.solution = np.copy(self.temp_arr)
-        #print(len(result))
-        print((time.time() - start_time))
-        # print("--- %s seconds ---" % (time.time() - start_time))
+        # print(len(result))
+        # print((time.time() - start_time))
+        print("--- %s seconds ---" % (time.time() - start_time))
         # plt.plot(result)
         # plt.ylabel("Number of Error(s)")
         # plt.xlabel("Number of Tries")
@@ -342,14 +344,14 @@ def main(argv):
         hitori.load(path + testCase)
         # tracemalloc.start()
         hitori.solve()
-        # hitori.printSolution()
+        hitori.printSolution()
         # snapshot = tracemalloc.take_snapshot()
         # display_top(snapshot)
-        # print('\n')
+        print('\n')
 
 
 if __name__ == '__main__':
     # main(sys.argv[1:])
-    main([])
+    main([''])
 
 
