@@ -17,7 +17,7 @@ def display_top(snapshot, key_type='lineno', limit=3):
         tracemalloc.Filter(False, "<unknown>"),
     ))
     top_stats = snapshot.statistics(key_type)
-
+    
     print("Top %s lines" % limit)
     for index, stat in enumerate(top_stats[:limit], 1):
         frame = stat.traceback[0]
@@ -35,7 +35,7 @@ def display_top(snapshot, key_type='lineno', limit=3):
         print("%s other: %.1f KiB" % (len(other), size / 1024))
     total = sum(stat.size for stat in top_stats)
     print("Total allocated size: %.1f B" % total)
-
+    print(total)
 
 class Hitori:
     def __init__(self, path=None):
@@ -234,13 +234,13 @@ class Hitori:
         pos = keys[self.rng.integers(0, len(keys))]
         old_value = self.temp_arr[pos], self.dup_lists[pos]
         result = 0
-        if self.rng.uniform(0, 1, None) < 0.5:
-            if 'b' == self.dup_lists[pos] or 'u' == self.dup_lists[pos]:
-                self.dup_lists[pos] = 'w'
-                self.temp_arr[pos] = self.array_grid[pos]
-            else:
-                self.dup_lists[pos] = 'b'
-                self.temp_arr[pos] = 0
+        #if self.rng.uniform(0, 1, None) < 0.5:
+        if 'b' == self.dup_lists[pos] or 'u' == self.dup_lists[pos]:
+            self.dup_lists[pos] = 'w'
+            self.temp_arr[pos] = self.array_grid[pos]
+        else:
+            self.dup_lists[pos] = 'b'
+            self.temp_arr[pos] = 0
 
         new_score = self.__scoreCalc()
         score_delta = new_score - old_score
@@ -322,7 +322,7 @@ class Hitori:
                 stuck_count = 0
 
         self.solution = np.copy(self.temp_arr)
-        print(len(result))
+        #print(len(result))
         print((time.time() - start_time))
         # print("--- %s seconds ---" % (time.time() - start_time))
         # plt.plot(result)
