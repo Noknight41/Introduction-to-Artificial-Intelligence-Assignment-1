@@ -340,8 +340,8 @@ def main(argv):
     for testCase in argv:
         # print(testCase)
         hitori.load(path + testCase)
-        hitori.solve()
         # tracemalloc.start()
+        hitori.solve()
         # hitori.printSolution()
         # snapshot = tracemalloc.take_snapshot()
         # display_top(snapshot)
