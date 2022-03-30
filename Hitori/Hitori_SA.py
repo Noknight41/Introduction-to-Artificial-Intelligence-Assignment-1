@@ -346,6 +346,7 @@ def main(argv):
         hitori.solve()
         hitori.printSolution()
         # snapshot = tracemalloc.take_snapshot()
+        # tracemalloc.stop()
         # display_top(snapshot)
         print('\n')
 
@@ -353,5 +354,3 @@ def main(argv):
 if __name__ == '__main__':
     # main(sys.argv[1:])
     main([''])
-
-
