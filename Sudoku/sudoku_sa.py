@@ -3,6 +3,7 @@ import numpy as np
 import math 
 from random import choice
 import matplotlib.pyplot as plt
+
 import time
 import tracemalloc
 import linecache
@@ -111,7 +112,6 @@ class Sudoku:
         while (1):
             firstBox = random.choice(block)
             secondBox = choice([box for box in block if box is not firstBox ])
-
             if fixedSudoku[firstBox[0], firstBox[1]] != 1 and fixedSudoku[secondBox[0], secondBox[1]] != 1:
                 return([firstBox, secondBox])
 
@@ -202,24 +202,20 @@ class Sudoku:
             self.printSudoku(tmpSudoku)
         print(len(result), sum(result) / len(result))
         # print("--- %s seconds ---" % (time.time() - start_time))
-        # plt.plot(result)
-        # plt.ylabel("Number of Error(s)")
-        # plt.xlabel("Number of Tries")
-        # plt.show()
+        plt.plot(result)
+        plt.ylabel("Number of Error(s)")
+        plt.xlabel("Number of Tries")
+        plt.show()
         
-
-
 # start_time = time.time()
-tracemalloc.start()
+# tracemalloc.start()
 puzzle = Sudoku()
 puzzle.load("test_10.txt")
-puzzle.solve(False)
+puzzle.solve()
 # print("--- %s seconds ---" % (time.time() - start_time))
 # start_time = time.time()
-snapshot = tracemalloc.take_snapshot()
-display_top(snapshot)
-    
-
+# snapshot = tracemalloc.take_snapshot()
+# display_top(snapshot)
 
 # 11: 25,061,118
 # 16: 37,251,751
