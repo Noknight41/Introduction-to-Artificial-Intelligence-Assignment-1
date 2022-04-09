@@ -139,6 +139,7 @@ class Sudoku:
             print(line)
         print("------------------------")
 
+# Run the program
 def main(argv):
     start_time = time.time()
     puzzle = Sudoku()

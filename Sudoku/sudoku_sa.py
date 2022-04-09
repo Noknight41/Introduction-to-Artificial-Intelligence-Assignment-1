@@ -206,6 +206,7 @@ class Sudoku:
         
 start_time = time.time()
 
+# Run the program
 def main(argv):
     puzzle = Sudoku()
     path = ''
