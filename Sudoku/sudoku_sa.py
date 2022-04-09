@@ -3,11 +3,7 @@ import numpy as np
 import math 
 from random import choice
 import matplotlib.pyplot as plt
-
-import time
-import tracemalloc
-import linecache
-import os
+import sys, time, tracemalloc, linecache, os
 
 def display_top(snapshot, key_type='lineno', limit=3):
     snapshot = snapshot.filter_traces((
@@ -52,12 +48,14 @@ class Sudoku:
         for i in range(len(data)):
             line = ""
             if i % self.m == 0:
-                print("---------------------")
+                print("------------------------")
             for j in range(len(data[i])):
                 if j  % self.m == 0:
                     line += "| "
-                line += str(data[i,j])+" "
+                line += str(data[i,j]) + " "
+            line += "| "
             print(line)
+        print("------------------------")
     
     # Marking which value is non-changable 
     def FixSudokuValues(self, fixed_sudoku):
@@ -200,24 +198,30 @@ class Sudoku:
         self.solution = tmpSudoku
         if printR == True:
             self.printSudoku(tmpSudoku)
-        print(len(result), sum(result) / len(result))
-        # print("--- %s seconds ---" % (time.time() - start_time))
+        print("--- %s seconds ---" % (time.time() - start_time))
         plt.plot(result)
         plt.ylabel("Number of Error(s)")
         plt.xlabel("Number of Tries")
         plt.show()
         
-# start_time = time.time()
-# tracemalloc.start()
-puzzle = Sudoku()
-puzzle.load("test_10.txt")
-puzzle.solve()
-# print("--- %s seconds ---" % (time.time() - start_time))
-# start_time = time.time()
-# snapshot = tracemalloc.take_snapshot()
-# display_top(snapshot)
+start_time = time.time()
 
-# 11: 25,061,118
-# 16: 37,251,751
-# 18: 13,336,158
-# 19: 8,449,051
+def main(argv):
+    puzzle = Sudoku()
+    path = ''
+    for testCase in argv:
+        # print(testCase)
+        puzzle.load(testCase)
+        # tracemalloc.start()
+        puzzle.solve()
+        # print("--- %s seconds ---" % (time.time() - start_time))
+        # snapshot = tracemalloc.take_snapshot()
+        # tracemalloc.stop()
+        # display_top(snapshot)
+        print('\n')
+
+if __name__ == '__main__':
+    if len(sys.argv) == 2:
+        main(sys.argv[1:])
+    else:
+        main(["test_1.txt"])
