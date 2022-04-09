@@ -9,7 +9,6 @@ import sys
 
 a = 0 
 
-
 class Graph:
     def __init__(self):
         self.graph = defaultdict(list)
@@ -78,7 +77,7 @@ def isInValidPointWhite(array, i,j):
 def checkSolution(array):
     global a
     a += 1
-    print('Loading ', a)
+    demoWritePuzzle(array)
     for i in array:
         result = list(filter(lambda x: x >0, i))
         if(len(list(Counter(result))) != len(result)): return False
@@ -123,6 +122,7 @@ def checkSolution(array):
     return True
 
 def load(path):
+    with open('demo_step_by_step_dfs.txt','w') as f: pass
     array = np.loadtxt(path, dtype=int)
     return array
 
@@ -137,8 +137,16 @@ def printArray(array):
             else: temp1 +=  ' ' + 'x'
         print(temp + '   ' + temp1)
 
-
-
+def demoWritePuzzle(array):
+    with open('demo_step_by_step_dfs.txt', 'a') as f:
+        f.writelines("Step " + str(a) + '\n')
+        for i in range(len(array)):
+            temp = ''
+            for j in range(len(array)):
+                if(array[i][j] > 0 ): temp += '  ' + str(array[i][j]) 
+                else: temp +=  ' ' + str(array[i][j]) 
+            f.writelines(temp + '\n')
+        f.writelines('\n')
 
 def main(argv):
     for testCase in argv:

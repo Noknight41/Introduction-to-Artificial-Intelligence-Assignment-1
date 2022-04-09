@@ -10,6 +10,7 @@ import tracemalloc
 import linecache
 import os
 
+a = 0
 
 def display_top(snapshot, key_type='lineno', limit=3):
     snapshot = snapshot.filter_traces((
@@ -52,6 +53,7 @@ class Hitori:
             self.load(path)
 
     def load(self, path):
+        with open('demo_step_by_step_sa.txt','w') as f: pass
         self.array_grid = np.loadtxt(path, dtype=int).flatten()
         length = len(self.array_grid)
         self.dimension = int(math.sqrt(length))
@@ -266,6 +268,23 @@ class Hitori:
                     self.temp_arr[i] = 0
                 else:
                     self.dup_lists[i] = 'w'
+    
+    def demoWritePuzzle(self, grid):
+        with open('demo_step_by_step_sa.txt', 'a') as f:
+            i = 0
+            line = ""
+            global a
+            a += 1
+            f.writelines("Step " + str(a) + '\n')
+            for element in grid:
+                if i == self.dimension:
+                    f.writelines(line + '\n')
+                    line = ""
+                    i = 0
+                else:
+                    line += str(element) + " "
+                    i = i + 1
+            f.writelines('\n\n')
 
     def solve(self):
         start_time = time.time()
@@ -303,6 +322,7 @@ class Hitori:
             for i in range(iterations_max):
                 counting += 1
                 score += self.__madeNewChange(score, temperature, keys)
+                self.demoWritePuzzle(self.temp_arr)
                 result.append(score)
                 if 0 == score:
                     if self.__checkResult():
