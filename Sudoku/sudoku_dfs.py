@@ -7,6 +7,8 @@ import tracemalloc
 import linecache
 import os
 
+a = 0
+
 # def display_top(snapshot, key_type='lineno', limit=3):
 #     snapshot = snapshot.filter_traces((
 #         tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
@@ -63,6 +65,7 @@ class Sudoku:
                 
     # Load Sudoku from txt file
     def load(self, path, print = True):
+        with open('demo_step_by_step_dfs.txt','w') as f: pass
         with open(path, "r") as f:
             file = np.loadtxt(f).astype(int)
             self.n = len(file[0])
@@ -103,6 +106,7 @@ class Sudoku:
         if self.solved == 1:
             return
         if node.data[i][j] == 0:
+            self.demoWritePuzzle(node.data)
             for value in range(1, self.n + 1):
                 if node.legalValue(value, i, j):
                     new_node = Node(copy.copy(node.m), copy.copy(node.data), self.copyRCB(node.row), self.copyRCB(node.column), self.copyRCB(node.block))
@@ -111,6 +115,7 @@ class Sudoku:
                         if i == self.n - 1:
                             self.solution = new_node
                             self.solved = 1
+                            self.demoWritePuzzle(new_node.data)
                         else:
                             self.fill(i + 1, 0, new_node)
                     else:
@@ -138,6 +143,23 @@ class Sudoku:
             line += "| "
             print(line)
         print("------------------------")
+    
+    def demoWritePuzzle(self, data):
+        global a
+        a += 1
+        with open('demo_step_by_step_dfs.txt', 'a') as f:
+            f.writelines("Step " + str(a) + '\n')
+            for i in range(len(data)):
+                line = ""
+                if i % self.m == 0:
+                    f.writelines("------------------------" + '\n')
+                for j in range(len(data[i])):
+                    if j  % self.m == 0:
+                        line += "| "
+                    line += str(data[i,j]) + " "
+                line += "| "
+                f.writelines(line + '\n')
+            f.writelines("------------------------" + '\n\n')
 
 # Run the program
 def main(argv):

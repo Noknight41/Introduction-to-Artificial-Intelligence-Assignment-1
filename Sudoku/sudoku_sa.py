@@ -5,6 +5,8 @@ from random import choice
 import matplotlib.pyplot as plt
 import sys, time, tracemalloc, linecache, os
 
+a = 0
+
 def display_top(snapshot, key_type='lineno', limit=3):
     snapshot = snapshot.filter_traces((
         tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
@@ -36,6 +38,7 @@ class Sudoku:
     
     # Load Sudoku from txt file 
     def load(self, path):
+        with open('demo_step_by_step_sa.txt','w') as f: pass
         with open(path, "r") as f:
             file = np.loadtxt(f).astype(int)
             self.n = len(file[0])
@@ -178,6 +181,7 @@ class Sudoku:
             for i in range (0, iterations):
                 newState = self.ChooseNewState(tmpSudoku, fixedSudoku, listOfBlocks, temperature)
                 tmpSudoku = newState[0]
+                self.demoWritePuzzle(tmpSudoku)
                 scoreDiff = newState[1]
                 score += scoreDiff
                 result += [-score]
@@ -203,6 +207,23 @@ class Sudoku:
         plt.ylabel("Number of Error(s)")
         plt.xlabel("Number of Tries")
         plt.show()
+        
+    def demoWritePuzzle(self, data):
+        global a
+        a += 1
+        with open('demo_step_by_step_sa.txt', 'a') as f:
+            f.writelines("Step " + str(a) + '\n')
+            for i in range(len(data)):
+                line = ""
+                if i % self.m == 0:
+                    f.writelines("------------------------" + '\n')
+                for j in range(len(data[i])):
+                    if j  % self.m == 0:
+                        line += "| "
+                    line += str(data[i,j]) + " "
+                line += "| "
+                f.writelines(line + '\n')
+            f.writelines("------------------------" + '\n\n')
         
 start_time = time.time()
 
