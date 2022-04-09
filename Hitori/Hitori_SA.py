@@ -277,13 +277,12 @@ class Hitori:
             a += 1
             f.writelines("Step " + str(a) + '\n')
             for element in grid:
+                line += str(element) + " "
+                i = i + 1
                 if i == self.dimension:
                     f.writelines(line + '\n')
                     line = ""
                     i = 0
-                else:
-                    line += str(element) + " "
-                    i = i + 1
             f.writelines('\n\n')
 
     def solve(self):
