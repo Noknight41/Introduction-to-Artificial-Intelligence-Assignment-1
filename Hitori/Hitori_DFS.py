@@ -2,46 +2,20 @@ from turtle import right
 from matplotlib.pyplot import flag
 import numpy as np
 from collections import Counter
+from collections import defaultdict
 import time
 import sys
-import tracemalloc
-import linecache
-import os
+
 
 a = 0 
 
-# def display_top(snapshot, key_type='lineno', limit=3):
-#     snapshot = snapshot.filter_traces((
-#         tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
-#         tracemalloc.Filter(False, "<unknown>"),
-#     ))
-#     top_stats = snapshot.statistics(key_type)
 
-#     print("Top %s lines" % limit)
-#     for index, stat in enumerate(top_stats[:limit], 1):
-#         frame = stat.traceback[0]
-#         # replace "/path/to/module/file.py" with "module/file.py"
-#         filename = os.sep.join(frame.filename.split(os.sep)[-2:])
-#         print("#%s: %s:%s: %.1f KiB"
-#               % (index, filename, frame.lineno, stat.size / 1024))
-#         line = linecache.getline(frame.filename, frame.lineno).strip()
-#         if line:
-#             print('    %s' % line)
-
-#     other = top_stats[limit:]
-#     if other:
-#         size = sum(stat.size for stat in other)
-#         print("%s other: %.1f KiB" % (len(other), size / 1024))
-#     total = sum(stat.size for stat in top_stats)
-#     print("Total allocated size: %.1f B" % (total))
-
-from collections import defaultdict
 class Graph:
     def __init__(self):
         self.graph = defaultdict(list)
     def addEdge(self,u,v):
         self.graph[u].append(v)
-    def connected(self, s, num):
+    def disconnected(self, s, num):
         visited = [False] * (max(self.graph) + 1)
         queue = []
         queue.append(s)
@@ -62,6 +36,7 @@ def solveSub(array, index):
     length = len(array)
     if(index == length * length):
         return checkSolution(array)
+        
     flag1 = False
     flag2 = False
     temp = []
@@ -73,6 +48,7 @@ def solveSub(array, index):
         flag2 = True
     if(flag1 and flag2):
         return solveSub(array, index+1)
+
     else:
         if(solveSub(array, index+1)):
             return True
@@ -101,8 +77,8 @@ def isInValidPointWhite(array, i,j):
 
 def checkSolution(array):
     global a
-    # a += 1
-    # print('Loading ', a)
+    a += 1
+    print('Loading ', a)
     for i in array:
         result = list(filter(lambda x: x >0, i))
         if(len(list(Counter(result))) != len(result)): return False
@@ -137,12 +113,13 @@ def checkSolution(array):
                 if(right  != -1):
                     g.addEdge(i*len(array)+j,right)
  
-    if(g.connected(start,num)): 
+    if(g.disconnected(start,num)): 
         return False
     # else:
         
     #     return False
     printArray(array)
+    a = 0
     return True
 
 def load(path):
@@ -163,23 +140,11 @@ def printArray(array):
 
 
 
-
-
-# snapshot = tracemalloc.take_snapshot()
-# display_top(snapshot)
-
 def main(argv):
-    start_time = time.time()
-    path = ''
     for testCase in argv:
-        # print(testCase)
+        start_time = time.time()
         array = load(testCase)
-        # tracemalloc.start()
         solve(array)
-        # print("--- %s seconds ---" % (time.time() - start_time))
-        # snapshot = tracemalloc.take_snapshot()
-        # tracemalloc.stop()
-        # display_top(snapshot)
         print("--- %s seconds ---" % (time.time() - start_time))
         print('\n')
 
