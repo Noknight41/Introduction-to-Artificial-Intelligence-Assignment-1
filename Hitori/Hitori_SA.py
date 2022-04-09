@@ -337,20 +337,21 @@ def main(argv):
     preset_test = ['test_1.txt', 'test_2.txt', 'test_3.txt', 'test_4.txt', 'test_5.txt', 'test_6.txt', 'test_7.txt',
                    'test_8.txt', 'test_9.txt', 'test_10.txt']
     hitori = Hitori()
-    argv = preset_test
-    path = ''
+    # argv = preset_test
+    # path = ''
     for testCase in argv:
         # print(testCase)
-        hitori.load(path + testCase)
+        # hitori.load(path + testCase)
+        hitori.load(testCase)
         # tracemalloc.start()
         hitori.solve()
         hitori.printSolution()
-        # snapshot = tracemalloc.take_snapshot()
         # tracemalloc.stop()
+        # snapshot = tracemalloc.take_snapshot()
         # display_top(snapshot)
         print('\n')
 
 
 if __name__ == '__main__':
-    # main(sys.argv[1:])
-    main([''])
+    main(sys.argv[1:])
+    # main([''])
