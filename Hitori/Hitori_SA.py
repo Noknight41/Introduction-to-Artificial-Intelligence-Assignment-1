@@ -338,12 +338,13 @@ def main(argv):
     path = ''
     for testCase in argv:
         # print(testCase)
-        hitori.load(path + testCase)
+        # hitori.load(path + testCase)
+        hitori.load(testCase)
         # tracemalloc.start()
         hitori.solve()
         hitori.printSolution()
-        # snapshot = tracemalloc.take_snapshot()
         # tracemalloc.stop()
+        # snapshot = tracemalloc.take_snapshot()
         # display_top(snapshot)
         print('\n')
 
