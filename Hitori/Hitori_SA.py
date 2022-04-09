@@ -37,7 +37,6 @@ def display_top(snapshot, key_type='lineno', limit=3):
     print("Total allocated size: %.1f B" % total)
     print(total)
 
-
 class Hitori:
     def __init__(self, path=None):
         self.old_dub_lists = []
@@ -58,6 +57,7 @@ class Hitori:
         self.dimension = int(math.sqrt(length))
         if length != self.dimension * self.dimension:
             raise RuntimeError("Incorrect dimension!")
+        self.printInitialGrid()
 
     def __printGrid(self, grid):
         i = 0
@@ -326,7 +326,7 @@ class Hitori:
         self.solution = np.copy(self.temp_arr)
         # print(len(result))
         # print((time.time() - start_time))
-        print("--- %s seconds ---" % (time.time() - start_time))
+        print("\n--- %s seconds ---" % (time.time() - start_time))
         # plt.plot(result)
         # plt.ylabel("Number of Error(s)")
         # plt.xlabel("Number of Tries")
@@ -334,10 +334,7 @@ class Hitori:
 
 
 def main(argv):
-    preset_test = ['test_1.txt', 'test_2.txt', 'test_3.txt', 'test_4.txt', 'test_5.txt', 'test_6.txt', 'test_7.txt',
-                   'test_8.txt', 'test_9.txt', 'test_10.txt']
     hitori = Hitori()
-    argv = preset_test
     path = ''
     for testCase in argv:
         # print(testCase)
@@ -350,7 +347,8 @@ def main(argv):
         # display_top(snapshot)
         print('\n')
 
-
 if __name__ == '__main__':
-    # main(sys.argv[1:])
-    main([''])
+    if len(sys.argv) == 2:
+        main(sys.argv[1:])
+    else:
+        main(["test_1.txt"])
