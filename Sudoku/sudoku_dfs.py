@@ -2,6 +2,7 @@ import numpy as np
 import math
 import copy
 import time
+import sys
 import tracemalloc
 import linecache
 import os
@@ -129,23 +130,36 @@ class Sudoku:
         for i in range(len(data)):
             line = ""
             if i % self.m == 0:
-                print("---------------------")
+                print("------------------------")
             for j in range(len(data[i])):
                 if j  % self.m == 0:
                     line += "| "
                 line += str(data[i,j]) + " "
+            line += "| "
             print(line)
+        print("------------------------")
 
-# Start
-# tracemalloc.start()
-start_time = time.time()
-puzzle = Sudoku()
-puzzle.load("test_14.txt", True)
-puzzle.solve(True)
-print("--- %s seconds ---" % (time.time() - start_time))
-# start_time = time.time()
-# snapshot = tracemalloc.take_snapshot()
-# display_top(snapshot)
+def main(argv):
+    start_time = time.time()
+    puzzle = Sudoku()
+    path = ''
+    for testCase in argv:
+        # print(testCase)
+        puzzle.load(testCase, True)
+        # tracemalloc.start()
+        puzzle.solve(True)
+        print("--- %s seconds ---" % (time.time() - start_time))
+        # snapshot = tracemalloc.take_snapshot()
+        # tracemalloc.stop()
+        # display_top(snapshot)
+        print('\n')
+
+if __name__ == '__main__':
+    if len(sys.argv) == 2:
+        main(sys.argv[1:])
+    else:
+        main(["test_1.txt"])
+
 
 
 
