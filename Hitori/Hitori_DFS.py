@@ -3,7 +3,7 @@ from matplotlib.pyplot import flag
 import numpy as np
 from collections import Counter
 import time
-
+import sys
 import tracemalloc
 import linecache
 import os
@@ -160,13 +160,31 @@ def printArray(array):
             else: temp1 +=  ' ' + 'x'
         print(temp + '   ' + temp1)
 
-start_time = time.time()
-# tracemalloc.start()
 
-array = load("test_11.txt")
-solve(array)
 
-print("--- %s seconds ---" % (time.time() - start_time))
-start_time = time.time()
+
+
+
 # snapshot = tracemalloc.take_snapshot()
 # display_top(snapshot)
+
+def main(argv):
+    start_time = time.time()
+    path = ''
+    for testCase in argv:
+        # print(testCase)
+        array = load(testCase)
+        # tracemalloc.start()
+        solve(array)
+        # print("--- %s seconds ---" % (time.time() - start_time))
+        # snapshot = tracemalloc.take_snapshot()
+        # tracemalloc.stop()
+        # display_top(snapshot)
+        print("--- %s seconds ---" % (time.time() - start_time))
+        print('\n')
+
+if __name__ == '__main__':
+    if len(sys.argv) == 2:
+        main(sys.argv[1:])
+    else:
+        main(["test_1.txt"])
